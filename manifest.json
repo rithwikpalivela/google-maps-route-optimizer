@@ -1,0 +1,23 @@
+{
+    "manifest_version": 3,
+    "name": "Google Maps Extension",
+    "version": "1.0",
+    "description": "A simple Chrome extension to demonstrate message passing from background to content scripts.",
+    "permissions": [
+        "scripting",
+        "tabs"
+    ],
+    "host_permissions": ["https://www.google.com/maps/dir/*"],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["contentScript.js"]
+        }
+    ],
+    "action": {
+        "default_icon": "gmap.png"
+    }
+}
