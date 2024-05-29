@@ -1,5 +1,5 @@
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-    const { type, locations } = message;
+    const { type, locations, currUrl } = message;
 
     if (type === "NEW") {
         const start = locations[0];
@@ -18,18 +18,22 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             }
         }
         distances[end][start] = 0;
-        console.log(distances);
+
         const bestPath = tspAlgo(distances);
-        console.log(bestPath);
+
         let newUrl = "https://www.google.com/maps/dir";
         for (const location of bestPath) {
             newUrl += '/' + location;
         }
-        console.log(newUrl);
-        chrome.runtime.sendMessage({
-            type: "OPT",
-            newUrl: newUrl
-        });
+        
+        if (newUrl !== currUrl) {
+            chrome.runtime.sendMessage({
+                type: "OPT",
+                newUrl: newUrl
+            });
+        } else {
+            alert("Current route is already optimal.");
+        }
     }
 
     return true;
@@ -55,6 +59,7 @@ async function calcDist(source, dest) {
 function tspAlgo(distances) {
     const locations = Object.keys(distances);
     const n = locations.length;
+    [locations[0], locations[n - 1]] = [locations[n - 1], locations[0]];
     const VISITED_ALL = (1 << n) - 1;
     const dp = Array.from({ length: 1 << n }, () => Array(n).fill(Infinity));
     const parent = Array.from({ length: 1 << n }, () => Array(n).fill(-1));
@@ -87,7 +92,7 @@ function tspAlgo(distances) {
     }
 
     let mask = VISITED_ALL;
-    const path = [];
+    let path = [];
     let city = lastCity;
 
     while (city !== -1) {
@@ -97,6 +102,7 @@ function tspAlgo(distances) {
         city = nextCity;
     }
     path.reverse();
+    path.push(path.shift());
 
     return path;
 }

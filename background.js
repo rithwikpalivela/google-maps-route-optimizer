@@ -5,7 +5,8 @@ chrome.action.onClicked.addListener(extensionClicked);
 function extensionClicked(tab) {
     chrome.tabs.sendMessage(tab.id, {
         type: "NEW",
-        locations: tab.url.substring(tab.url.indexOf(urlPrefix) + urlPrefix.length, tab.url.indexOf('@') - 1).split('/')
+        locations: tab.url.substring(tab.url.indexOf(urlPrefix) + urlPrefix.length, tab.url.indexOf('@') - 1).split('/'),
+        currUrl: tab.url.substring(0, tab.url.indexOf('@') - 1)
     });
 }
 
